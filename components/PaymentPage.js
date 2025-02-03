@@ -1,16 +1,31 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Script from 'next/script'
 import Razorpay from 'razorpay'
-import { initiate } from '@/actions/useractions'
+import { fetchpayments, initiate, fetchuser } from '@/actions/useractions'
 import { useSession } from 'next-auth/react'
 
 const PaymentPage = ({ username }) => {
     // const { data: session } = useSession()
     const [paymentform, setPaymentform] = useState({})
+    const [currentUser, setcurrentUser] = useState({})
+    const [payments, setPayments] = useState([])
+
+    useEffect(() => {
+      getData()
+    }, [])
+    
 
     const handleChange = (e) => {
         setPaymentform({ ...paymentform, [e.target.name]: e.target.value})
+    }
+
+    const getData = async (params) => {
+        let u = await fetchuser(username)
+        setcurrentUser(u)
+        let dbpayments = await fetchpayments(username)
+        setPayments(dbpayments)
+        console.log(u, dbpayments)
     }
 
     const pay = async (amount) => {
